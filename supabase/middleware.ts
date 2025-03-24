@@ -35,16 +35,38 @@ export const updateSession = async (request: NextRequest) => {
             });
           },
         },
-      }
+      },
     );
 
     // This will refresh session if expired - required for Server Components
     // https://supabase.com/docs/guides/auth/server-side/nextjs
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     // protected routes
-    if (request.nextUrl.pathname.startsWith("/dashboard") && error) {
+    if (
+      (request.nextUrl.pathname.startsWith("/dashboard") ||
+        request.nextUrl.pathname.startsWith("/admin")) &&
+      error
+    ) {
       return NextResponse.redirect(new URL("/sign-in", request.url));
+    }
+
+    // admin routes protection
+    if (request.nextUrl.pathname.startsWith("/admin") && !error) {
+      // Check if user is admin
+      const { data: userData } = await supabase
+        .from("users")
+        .select("is_admin")
+        .eq("id", user.id)
+        .single();
+
+      if (!userData?.is_admin) {
+        // Redirect non-admin users to home page
+        return NextResponse.redirect(new URL("/", request.url));
+      }
     }
 
     if (request.nextUrl.pathname === "/" && !error) {

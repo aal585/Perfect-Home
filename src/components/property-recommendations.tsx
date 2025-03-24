@@ -92,17 +92,13 @@ export default function PropertyRecommendations() {
       } = await supabase.auth.getUser();
       if (!user) return; // Only record for authenticated users
 
-      await supabase.from("browsing_history").upsert(
-        {
-          user_id: user.id,
-          property_id: propertyId,
-          viewed_at: new Date().toISOString(),
+      await fetch("/api/record-view", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        {
-          onConflict: "user_id,property_id",
-          ignoreDuplicates: false,
-        },
-      );
+        body: JSON.stringify({ propertyId }),
+      });
     } catch (err) {
       console.error("Error recording property view:", err);
     }

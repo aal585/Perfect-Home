@@ -19,10 +19,12 @@ interface Furniture {
 
 interface FurnitureRecommendationsProps {
   propertyId?: string;
+  roomType?: "living" | "bedroom" | "dining" | "kitchen";
 }
 
-export default function FurnitureRecommendations({
+export function FurnitureRecommendations({
   propertyId,
+  roomType = "living",
 }: FurnitureRecommendationsProps) {
   const [recommendations, setRecommendations] = useState<Furniture[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,7 +59,12 @@ export default function FurnitureRecommendations({
         const { data, error: functionError } = await supabase.functions.invoke(
           "recommend-furniture",
           {
-            body: { user_id: user.id, property_id: propertyId, limit: 6 },
+            body: {
+              user_id: user.id,
+              property_id: propertyId,
+              limit: 6,
+              room_type: roomType,
+            },
           },
         );
 
@@ -87,7 +94,7 @@ export default function FurnitureRecommendations({
     };
 
     fetchRecommendations();
-  }, [language, propertyId]);
+  }, [language, propertyId, roomType, supabase]);
 
   // Record furniture view in browsing history
   const recordFurnitureView = async (furnitureId: string) => {
@@ -170,3 +177,5 @@ export default function FurnitureRecommendations({
     </div>
   );
 }
+
+export default FurnitureRecommendations;

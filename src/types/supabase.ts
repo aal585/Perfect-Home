@@ -9,6 +9,76 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_logs: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string | null
+          details: Json | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_logs_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_settings: {
+        Row: {
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       browsing_history: {
         Row: {
           id: string
@@ -79,6 +149,35 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      furniture_browsing_history: {
+        Row: {
+          furniture_id: string
+          id: string
+          user_id: string
+          viewed_at: string | null
+        }
+        Insert: {
+          furniture_id: string
+          id?: string
+          user_id: string
+          viewed_at?: string | null
+        }
+        Update: {
+          furniture_id?: string
+          id?: string
+          user_id?: string
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_furniture_browsing_history_furniture"
+            columns: ["furniture_id"]
+            isOneToOne: false
+            referencedRelation: "furniture"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       maintenance_bookings: {
         Row: {
@@ -253,6 +352,45 @@ export type Database = {
           },
         ]
       }
+      search_history: {
+        Row: {
+          created_at: string | null
+          features: string[] | null
+          id: string
+          language: string
+          location: string | null
+          price_range: string | null
+          property_type: string | null
+          query: string
+          search_type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          features?: string[] | null
+          id?: string
+          language?: string
+          location?: string | null
+          price_range?: string | null
+          property_type?: string | null
+          query: string
+          search_type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          features?: string[] | null
+          id?: string
+          language?: string
+          location?: string | null
+          price_range?: string | null
+          property_type?: string | null
+          query?: string
+          search_type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           created_at: string | null
@@ -300,6 +438,7 @@ export type Database = {
           full_name: string | null
           id: string
           image: string | null
+          is_admin: boolean | null
           name: string | null
           token_identifier: string
           updated_at: string | null
@@ -312,6 +451,7 @@ export type Database = {
           full_name?: string | null
           id: string
           image?: string | null
+          is_admin?: boolean | null
           name?: string | null
           token_identifier: string
           updated_at?: string | null
@@ -324,6 +464,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           image?: string | null
+          is_admin?: boolean | null
           name?: string | null
           token_identifier?: string
           updated_at?: string | null
@@ -336,7 +477,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_personalized_recommendations: {
+        Args: {
+          p_user_id: string
+          p_limit?: number
+        }
+        Returns: {
+          property_id: string
+          relevance_score: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

@@ -44,8 +44,8 @@ export default function AIChatbot() {
     if (messages.length === 0) {
       const greeting =
         language === "ar"
-          ? "مرحبًا! أنا المساعد الافتراضي لسكن مصر. كيف يمكنني مساعدتك اليوم؟"
-          : "Hello! I'm SakanEgypt's virtual assistant. How can I help you today?";
+          ? "أهلاً بك! أنا المساعد الذكي لسكن مصر. كيف أقدر أساعدك النهاردة؟ ممكن تسألني عن الشقق والفلل في أي منطقة زي التجمع أو الشيخ زايد، أو عن الأثاث والديكور، أو خدمات الصيانة."
+          : "Hello! I'm SakanEgypt's virtual assistant. How can I help you today? You can ask me about apartments and villas in any area like New Cairo or Sheikh Zayed, or about furniture and decor, or maintenance services.";
 
       setMessages([
         {
@@ -71,6 +71,12 @@ export default function AIChatbot() {
                 language === "ar" ? "خدمات الصيانة" : "Maintenance services",
               action: () => {
                 handleQuickReply("maintenance");
+              },
+            },
+            {
+              label: language === "ar" ? "خيارات الدفع" : "Payment options",
+              action: () => {
+                handleQuickReply("payment");
               },
             },
           ],
@@ -158,41 +164,163 @@ export default function AIChatbot() {
     const userInput = input.toLowerCase();
     let messageType = "default";
 
+    // Enhanced Arabic language detection including Egyptian dialect terms
+    const propertyTerms = {
+      english: [
+        "property",
+        "house",
+        "apartment",
+        "flat",
+        "villa",
+        "real estate",
+        "home",
+        "condo",
+      ],
+      arabic: [
+        "عقار",
+        "منزل",
+        "شقة",
+        "فيلا",
+        "بيت",
+        "سكن",
+        "عمارة",
+        "دور",
+        "شاليه",
+        "روف",
+        "دوبلكس",
+        "استوديو",
+      ],
+    };
+
+    const furnitureTerms = {
+      english: [
+        "furniture",
+        "sofa",
+        "table",
+        "chair",
+        "bed",
+        "cabinet",
+        "desk",
+        "wardrobe",
+      ],
+      arabic: [
+        "أثاث",
+        "كنبة",
+        "طاولة",
+        "كرسي",
+        "سرير",
+        "دولاب",
+        "مكتب",
+        "ترابيزة",
+        "انتريه",
+        "مطبخ",
+        "سفرة",
+      ],
+    };
+
+    const maintenanceTerms = {
+      english: [
+        "maintenance",
+        "repair",
+        "fix",
+        "service",
+        "plumbing",
+        "electrical",
+        "broken",
+      ],
+      arabic: [
+        "صيانة",
+        "إصلاح",
+        "تصليح",
+        "خدمة",
+        "سباكة",
+        "كهرباء",
+        "عطل",
+        "مكسور",
+        "بايظ",
+        "عطلان",
+        "مش شغال",
+      ],
+    };
+
+    const paymentTerms = {
+      english: [
+        "payment",
+        "pay",
+        "money",
+        "cash",
+        "installment",
+        "loan",
+        "mortgage",
+        "price",
+      ],
+      arabic: [
+        "دفع",
+        "دفعة",
+        "فلوس",
+        "كاش",
+        "قسط",
+        "أقساط",
+        "تقسيط",
+        "قرض",
+        "رهن",
+        "سعر",
+        "تمن",
+        "تكلفة",
+      ],
+    };
+
+    const locationTerms = {
+      english: [
+        "location",
+        "area",
+        "neighborhood",
+        "district",
+        "city",
+        "address",
+      ],
+      arabic: [
+        "موقع",
+        "منطقة",
+        "حي",
+        "مدينة",
+        "عنوان",
+        "مكان",
+        "التجمع",
+        "الشيخ زايد",
+        "المعادي",
+        "مدينة نصر",
+        "المهندسين",
+        "الدقي",
+      ],
+    };
+
+    // Check if input contains any of the terms
     if (
-      userInput.includes("property") ||
-      userInput.includes("house") ||
-      userInput.includes("apartment") ||
-      userInput.includes("عقار") ||
-      userInput.includes("منزل") ||
-      userInput.includes("شقة")
+      propertyTerms.english.some((term) => userInput.includes(term)) ||
+      propertyTerms.arabic.some((term) => userInput.includes(term))
     ) {
       messageType = "property";
     } else if (
-      userInput.includes("furniture") ||
-      userInput.includes("sofa") ||
-      userInput.includes("table") ||
-      userInput.includes("أثاث") ||
-      userInput.includes("كنبة") ||
-      userInput.includes("طاولة")
+      furnitureTerms.english.some((term) => userInput.includes(term)) ||
+      furnitureTerms.arabic.some((term) => userInput.includes(term))
     ) {
       messageType = "furniture";
     } else if (
-      userInput.includes("maintenance") ||
-      userInput.includes("repair") ||
-      userInput.includes("fix") ||
-      userInput.includes("صيانة") ||
-      userInput.includes("إصلاح") ||
-      userInput.includes("تصليح")
+      maintenanceTerms.english.some((term) => userInput.includes(term)) ||
+      maintenanceTerms.arabic.some((term) => userInput.includes(term))
     ) {
       messageType = "maintenance";
     } else if (
-      userInput.includes("payment") ||
-      userInput.includes("pay") ||
-      userInput.includes("money") ||
-      userInput.includes("دفع") ||
-      userInput.includes("دفعة")
+      paymentTerms.english.some((term) => userInput.includes(term)) ||
+      paymentTerms.arabic.some((term) => userInput.includes(term))
     ) {
       messageType = "payment";
+    } else if (
+      locationTerms.english.some((term) => userInput.includes(term)) ||
+      locationTerms.arabic.some((term) => userInput.includes(term))
+    ) {
+      messageType = "property"; // Redirect location queries to property search
     }
 
     // Process response based on message type
@@ -205,12 +333,73 @@ export default function AIChatbot() {
     let responseContent = "";
     let responseActions: { label: string; action: () => void }[] = [];
 
+    // Check for specific location mentions in Egyptian context
+    const egyptianLocations = [
+      "التجمع",
+      "الشيخ زايد",
+      "المعادي",
+      "مدينة نصر",
+      "المهندسين",
+      "الدقي",
+      "الرحاب",
+      "6 أكتوبر",
+      "العاصمة الإدارية",
+      "العبور",
+      "الشروق",
+      "بدر",
+      "المقطم",
+      "حلوان",
+      "المنصورية",
+      "الهرم",
+      "فيصل",
+      "العجوزة",
+      "الزمالك",
+      "جاردن سيتي",
+      "المنيل",
+      "المرج",
+    ];
+
+    // Check for property types in Egyptian context
+    const egyptianPropertyTypes = [
+      "شقة",
+      "فيلا",
+      "دوبلكس",
+      "روف",
+      "بنتهاوس",
+      "استوديو",
+      "شاليه",
+      "توين هاوس",
+      "تاون هاوس",
+    ];
+
+    // Check if the user mentioned a specific location or property type
+    const mentionedLocation = egyptianLocations.find((location) =>
+      userInput.toLowerCase().includes(location.toLowerCase()),
+    );
+
+    const mentionedPropertyType = egyptianPropertyTypes.find((type) =>
+      userInput.toLowerCase().includes(type.toLowerCase()),
+    );
+
     switch (messageType) {
       case "property":
-        responseContent =
-          language === "ar"
-            ? "يمكنني مساعدتك في العثور على العقار المناسب. ما هي المنطقة التي تبحث عنها؟"
-            : "I can help you find the right property. What area are you looking for?";
+        if (mentionedLocation) {
+          responseContent =
+            language === "ar"
+              ? `نعم، لدينا عدة خيارات في منطقة ${mentionedLocation}. هل تبحث عن نوع معين من العقارات؟`
+              : `Yes, we have several options in ${mentionedLocation}. Are you looking for a specific type of property?`;
+        } else if (mentionedPropertyType) {
+          responseContent =
+            language === "ar"
+              ? `لدينا مجموعة متنوعة من ${mentionedPropertyType} في مناطق مختلفة. هل هناك منطقة معينة تفضلها؟`
+              : `We have a variety of ${mentionedPropertyType} in different areas. Is there a specific area you prefer?`;
+        } else {
+          responseContent =
+            language === "ar"
+              ? "يمكنني مساعدتك في العثور على العقار المناسب. ما هي المنطقة التي تبحث عنها؟ لدينا خيارات في التجمع والشيخ زايد ومدينة نصر والمعادي وغيرها."
+              : "I can help you find the right property. What area are you looking for? We have options in New Cairo, Sheikh Zayed, Nasr City, Maadi and others.";
+        }
+
         responseActions = [
           {
             label: language === "ar" ? "تصفح العقارات" : "Browse properties",
@@ -220,59 +409,222 @@ export default function AIChatbot() {
             label: language === "ar" ? "البحث المتقدم" : "Advanced search",
             action: () => router.push("/properties?advanced=true"),
           },
+          {
+            label: language === "ar" ? "عقارات جديدة" : "New listings",
+            action: () => router.push("/properties?sort=newest"),
+          },
         ];
         break;
 
       case "furniture":
-        responseContent =
-          language === "ar"
-            ? "لدينا مجموعة واسعة من الأثاث لتناسب منزلك الجديد. هل تبحث عن شيء محدد؟"
-            : "We have a wide range of furniture to suit your new home. Are you looking for something specific?";
-        responseActions = [
-          {
-            label: language === "ar" ? "تصفح الأثاث" : "Browse furniture",
-            action: () => router.push("/furniture"),
-          },
-          {
-            label:
-              language === "ar"
-                ? "تجربة وضع الأثاث الافتراضي"
-                : "Try virtual placement",
-            action: () => router.push("/furniture?virtual=true"),
-          },
-        ];
+        // Check for specific furniture mentions
+        const isSofaMentioned =
+          userInput.toLowerCase().includes("كنبة") ||
+          userInput.toLowerCase().includes("انتريه") ||
+          userInput.toLowerCase().includes("sofa");
+
+        const isBedroomMentioned =
+          userInput.toLowerCase().includes("سرير") ||
+          userInput.toLowerCase().includes("غرفة نوم") ||
+          userInput.toLowerCase().includes("bed") ||
+          userInput.toLowerCase().includes("bedroom");
+
+        const isDiningMentioned =
+          userInput.toLowerCase().includes("سفرة") ||
+          userInput.toLowerCase().includes("طاولة طعام") ||
+          userInput.toLowerCase().includes("dining");
+
+        if (isSofaMentioned) {
+          responseContent =
+            language === "ar"
+              ? "لدينا تشكيلة واسعة من الكنب والانتريهات بأنماط عصرية وكلاسيكية. هل تفضل نمط معين؟"
+              : "We have a wide selection of sofas and living room sets in modern and classic styles. Do you prefer a specific style?";
+          responseActions = [
+            {
+              label: language === "ar" ? "تصفح الكنب" : "Browse sofas",
+              action: () => router.push("/furniture?category=sofas"),
+            },
+          ];
+        } else if (isBedroomMentioned) {
+          responseContent =
+            language === "ar"
+              ? "نوفر مجموعة متنوعة من أثاث غرف النوم بتصاميم مختلفة تناسب جميع الأذواق."
+              : "We provide a variety of bedroom furniture with different designs to suit all tastes.";
+          responseActions = [
+            {
+              label:
+                language === "ar"
+                  ? "تصفح أثاث غرف النوم"
+                  : "Browse bedroom furniture",
+              action: () => router.push("/furniture?category=bedroom"),
+            },
+          ];
+        } else if (isDiningMentioned) {
+          responseContent =
+            language === "ar"
+              ? "لدينا طاولات سفرة بأحجام مختلفة تناسب المساحات الصغيرة والكبيرة."
+              : "We have dining tables in various sizes suitable for both small and large spaces.";
+          responseActions = [
+            {
+              label:
+                language === "ar"
+                  ? "تصفح طاولات السفرة"
+                  : "Browse dining tables",
+              action: () => router.push("/furniture?category=dining"),
+            },
+          ];
+        } else {
+          responseContent =
+            language === "ar"
+              ? "لدينا مجموعة واسعة من الأثاث لتناسب منزلك الجديد. هل تبحث عن أثاث غرفة معينة مثل غرفة المعيشة أو غرفة النوم أو السفرة؟"
+              : "We have a wide range of furniture to suit your new home. Are you looking for furniture for a specific room like living room, bedroom, or dining room?";
+          responseActions = [
+            {
+              label: language === "ar" ? "تصفح الأثاث" : "Browse furniture",
+              action: () => router.push("/furniture"),
+            },
+            {
+              label:
+                language === "ar"
+                  ? "تجربة وضع الأثاث الافتراضي"
+                  : "Try virtual placement",
+              action: () => router.push("/furniture?virtual=true"),
+            },
+          ];
+        }
         break;
 
       case "maintenance":
-        responseContent =
-          language === "ar"
-            ? "نقدم خدمات صيانة موثوقة لمنزلك. ما نوع الخدمة التي تحتاجها؟"
-            : "We offer reliable maintenance services for your home. What type of service do you need?";
-        responseActions = [
-          {
-            label: language === "ar" ? "خدمات السباكة" : "Plumbing services",
-            action: () => router.push("/maintenance?type=plumbing"),
-          },
-          {
-            label: language === "ar" ? "خدمات الكهرباء" : "Electrical services",
-            action: () => router.push("/maintenance?type=electrical"),
-          },
-          {
-            label: language === "ar" ? "جميع الخدمات" : "All services",
-            action: () => router.push("/maintenance"),
-          },
-        ];
+        // Check for specific maintenance issues
+        const isPlumbingMentioned =
+          userInput.toLowerCase().includes("سباكة") ||
+          userInput.toLowerCase().includes("مياه") ||
+          userInput.toLowerCase().includes("تسريب") ||
+          userInput.toLowerCase().includes("حنفية") ||
+          userInput.toLowerCase().includes("plumbing") ||
+          userInput.toLowerCase().includes("water") ||
+          userInput.toLowerCase().includes("leak");
+
+        const isElectricalMentioned =
+          userInput.toLowerCase().includes("كهرباء") ||
+          userInput.toLowerCase().includes("كهربائي") ||
+          userInput.toLowerCase().includes("electrical") ||
+          userInput.toLowerCase().includes("electric");
+
+        const isACMentioned =
+          userInput.toLowerCase().includes("تكييف") ||
+          userInput.toLowerCase().includes("مكيف") ||
+          userInput.toLowerCase().includes("ac") ||
+          userInput.toLowerCase().includes("air condition");
+
+        if (isPlumbingMentioned) {
+          responseContent =
+            language === "ar"
+              ? "نقدم خدمات سباكة احترافية لإصلاح التسريبات وصيانة الحنفيات والمواسير. هل تحتاج إلى خدمة طارئة؟"
+              : "We provide professional plumbing services to fix leaks and maintain faucets and pipes. Do you need an emergency service?";
+          responseActions = [
+            {
+              label:
+                language === "ar" ? "حجز خدمة سباكة" : "Book plumbing service",
+              action: () => router.push("/maintenance?type=plumbing"),
+            },
+          ];
+        } else if (isElectricalMentioned) {
+          responseContent =
+            language === "ar"
+              ? "فنيو الكهرباء لدينا مؤهلون لإصلاح جميع المشاكل الكهربائية بأمان وكفاءة."
+              : "Our electricians are qualified to fix all electrical problems safely and efficiently.";
+          responseActions = [
+            {
+              label:
+                language === "ar"
+                  ? "حجز خدمة كهرباء"
+                  : "Book electrical service",
+              action: () => router.push("/maintenance?type=electrical"),
+            },
+          ];
+        } else if (isACMentioned) {
+          responseContent =
+            language === "ar"
+              ? "نقدم خدمات صيانة وإصلاح أجهزة التكييف لجميع الماركات."
+              : "We provide maintenance and repair services for air conditioners of all brands.";
+          responseActions = [
+            {
+              label: language === "ar" ? "حجز خدمة تكييف" : "Book AC service",
+              action: () => router.push("/maintenance?type=ac"),
+            },
+          ];
+        } else {
+          responseContent =
+            language === "ar"
+              ? "نقدم خدمات صيانة موثوقة لمنزلك. ما نوع الخدمة التي تحتاجها؟ لدينا خدمات سباكة وكهرباء وتكييف ونجارة وغيرها."
+              : "We offer reliable maintenance services for your home. What type of service do you need? We have plumbing, electrical, AC, carpentry and other services.";
+          responseActions = [
+            {
+              label: language === "ar" ? "خدمات السباكة" : "Plumbing services",
+              action: () => router.push("/maintenance?type=plumbing"),
+            },
+            {
+              label:
+                language === "ar" ? "خدمات الكهرباء" : "Electrical services",
+              action: () => router.push("/maintenance?type=electrical"),
+            },
+            {
+              label: language === "ar" ? "جميع الخدمات" : "All services",
+              action: () => router.push("/maintenance"),
+            },
+          ];
+        }
         break;
 
       case "payment":
-        responseContent =
-          language === "ar"
-            ? "نحن ندعم العديد من خيارات الدفع المحلية بما في ذلك فودافون كاش وفوري وInstaPay وبطاقات الائتمان."
-            : "We support many local payment options including Vodafone Cash, Fawry, InstaPay, and credit cards.";
+        // Check for specific payment methods
+        const isInstallmentMentioned =
+          userInput.toLowerCase().includes("تقسيط") ||
+          userInput.toLowerCase().includes("أقساط") ||
+          userInput.toLowerCase().includes("installment");
+
+        const isCashMentioned =
+          userInput.toLowerCase().includes("كاش") ||
+          userInput.toLowerCase().includes("نقدي") ||
+          userInput.toLowerCase().includes("cash");
+
+        const isMobileMentioned =
+          userInput.toLowerCase().includes("فودافون كاش") ||
+          userInput.toLowerCase().includes("موبايل") ||
+          userInput.toLowerCase().includes("vodafone") ||
+          userInput.toLowerCase().includes("mobile");
+
+        if (isInstallmentMentioned) {
+          responseContent =
+            language === "ar"
+              ? "نعم، نقدم خيارات تقسيط مرنة تصل إلى 60 شهرًا مع بنوك مختلفة. هل تريد معرفة المزيد عن خطط التقسيط المتاحة؟"
+              : "Yes, we offer flexible installment options up to 60 months with various banks. Would you like to know more about available installment plans?";
+        } else if (isCashMentioned) {
+          responseContent =
+            language === "ar"
+              ? "بالتأكيد، نقبل الدفع النقدي ونقدم خصومات خاصة للدفع الفوري."
+              : "Certainly, we accept cash payments and offer special discounts for immediate payment.";
+        } else if (isMobileMentioned) {
+          responseContent =
+            language === "ar"
+              ? "نعم، يمكنك الدفع باستخدام فودافون كاش وغيرها من خدمات الدفع عبر الموبايل مثل اتصالات كاش وأورانج كاش."
+              : "Yes, you can pay using Vodafone Cash and other mobile payment services like Etisalat Cash and Orange Cash.";
+        } else {
+          responseContent =
+            language === "ar"
+              ? "نحن ندعم العديد من خيارات الدفع المحلية بما في ذلك فودافون كاش وفوري وInstaPay وبطاقات الائتمان والتقسيط البنكي حتى 60 شهرًا."
+              : "We support many local payment options including Vodafone Cash, Fawry, InstaPay, credit cards, and bank installments up to 60 months.";
+        }
+
         responseActions = [
           {
             label: language === "ar" ? "معرفة المزيد" : "Learn more",
             action: () => router.push("/payment-options"),
+          },
+          {
+            label: language === "ar" ? "خطط التقسيط" : "Installment plans",
+            action: () => router.push("/payment-options?type=installment"),
           },
         ];
         break;
@@ -280,8 +632,8 @@ export default function AIChatbot() {
       default:
         responseContent =
           language === "ar"
-            ? "شكرًا على رسالتك. هل يمكنني مساعدتك في شيء آخر؟"
-            : "Thank you for your message. Can I help you with something else?";
+            ? "شكرًا على رسالتك. هل يمكنني مساعدتك في البحث عن عقار أو أثاث أو خدمات صيانة؟ أنا هنا للإجابة على جميع استفساراتك."
+            : "Thank you for your message. Can I help you find a property, furniture, or maintenance services? I'm here to answer all your inquiries.";
         responseActions = [
           {
             label: language === "ar" ? "البحث عن عقار" : "Find a property",
@@ -294,6 +646,10 @@ export default function AIChatbot() {
           {
             label: language === "ar" ? "خدمات الصيانة" : "Maintenance services",
             action: () => handleQuickReply("maintenance"),
+          },
+          {
+            label: language === "ar" ? "خيارات الدفع" : "Payment options",
+            action: () => handleQuickReply("payment"),
           },
         ];
     }
